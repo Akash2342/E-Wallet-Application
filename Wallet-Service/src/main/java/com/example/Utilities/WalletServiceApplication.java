@@ -1,4 +1,4 @@
-package com.example.WalletService;
+package com.example.Utilities;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

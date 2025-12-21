@@ -3,14 +3,17 @@ package com.example.UserService.services;
 import com.example.UserService.dtos.UserRequestDTO;
 import com.example.UserService.model.Users;
 import com.example.UserService.repository.UserRepository;
+import com.example.Utilities.dtos.UserCreatedkafkaDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -20,6 +23,12 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Value("${user.Authority}")
     private String userAuthority;
@@ -34,13 +43,29 @@ public class UserService implements UserDetailsService {
         // CHECK if user already exists
         Users existing = userRepository.findByContact(user.getContact());
 
-        if (existing != null) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         // Save new user
 
-        return userRepository.save(user);
+        Users savedUser = userRepository.save(user);
+
+        // 🔥 Build Kafka JSON
+        UserCreatedkafkaDTO event = UserCreatedkafkaDTO.builder()
+                .name(savedUser.getName())
+                .contact(savedUser.getContact())
+                .email(savedUser.getEmail())
+                .userIdentifierValue(savedUser.getUserIdentifierValue())
+                .userIdentifier(savedUser.getIdentifier().name())
+                .build();
+
+        try {
+            String json = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send("USER_CREATED_TOPIC", json);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send Kafka message", e);
+        }
+
+        return savedUser;
     }
 
 

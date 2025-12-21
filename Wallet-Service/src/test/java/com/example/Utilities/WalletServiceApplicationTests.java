@@ -1,4 +1,4 @@
-package com.example.WalletService;
+package com.example.Utilities;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
