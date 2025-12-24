@@ -14,4 +14,5 @@ public class UserCreatedkafkaDTO {
     private String email;
     private String userIdentifierValue;
     private String userIdentifier;
+    private Integer userId;
 }

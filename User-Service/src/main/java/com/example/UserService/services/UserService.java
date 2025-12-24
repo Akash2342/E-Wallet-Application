@@ -56,6 +56,7 @@ public class UserService implements UserDetailsService {
                 .email(savedUser.getEmail())
                 .userIdentifierValue(savedUser.getUserIdentifierValue())
                 .userIdentifier(savedUser.getIdentifier().name())
+                .userId(savedUser.getPk())
                 .build();
 
         try {

@@ -50,7 +50,8 @@ public class UserCreatedConsumer {
             mail.setFrom("doremonxxx010@gmail.com");
 
             log.info("Sending email to {}", event.getEmail());
-            javaMailSender.send(mail);
+            //mailtrap taking long time to post, will find some other alternatives
+           // javaMailSender.send(mail);
             log.info("Email sent successfully");
 
 
