@@ -52,7 +52,7 @@ public class UserCreatedConsumer {
                 build();
 
         try {
-            String json = objectMapper.writeValueAsString(event);
+            String json = objectMapper.writeValueAsString(walletCreatedKafkaDTO);
             kafkaTemplate.send("WALLET_CREATED_TOPIC", json);
 
             log.info("produced kafka message for wallet notification");

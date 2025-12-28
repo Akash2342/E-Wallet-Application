@@ -28,6 +28,7 @@ public class UserServiceApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		//comment out this code if this is already created in users db
 		Users users = Users.builder().contact("txn-service").
 				password(passwordEncoder.encode("txn-service")).
 				enabled(true).accountNonLocked(true).credentialsNonExpired(true).accountNonExpired(true).
