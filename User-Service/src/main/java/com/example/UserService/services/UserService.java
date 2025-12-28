@@ -1,6 +1,7 @@
 package com.example.UserService.services;
 
 import com.example.UserService.dtos.UserRequestDTO;
+import com.example.UserService.model.UserType;
 import com.example.UserService.model.Users;
 import com.example.UserService.repository.UserRepository;
 import com.example.Utilities.dtos.UserCreatedkafkaDTO;
@@ -39,6 +40,7 @@ public class UserService implements UserDetailsService {
     public Users addUser(@Valid UserRequestDTO dto) {
         Users user = dto.toUser();
         user.setAuthorities(userAuthority);
+        user.setUserType(UserType.USER);
 
         // CHECK if user already exists
         Users existing = userRepository.findByContact(user.getContact());
@@ -71,7 +73,7 @@ public class UserService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public Users loadUserByUsername(String username)
             throws UsernameNotFoundException {
         Users user = userRepository.findByContact(username);
         if (user == null) {

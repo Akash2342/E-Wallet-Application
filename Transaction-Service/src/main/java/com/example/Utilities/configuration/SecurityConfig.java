@@ -1,5 +1,6 @@
-package com.example.UserService.configuration;
-import com.example.UserService.services.UserService;
+package com.example.Utilities.configuration;
+
+import com.example.Utilities.service.TxnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     @Autowired
-    private UserService userService;
+    private TxnService txnService;
 
     @Autowired
     private CommonConfig commonConfig;
@@ -32,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider(userService);  // <-- correct for Spring Security 6+
+                new DaoAuthenticationProvider(txnService);  // <-- correct for Spring Security 6+
 
         provider.setPasswordEncoder(commonConfig.getEncoder());
         return provider;
@@ -44,11 +45,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(withDefaults())
-                .formLogin(form -> form.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/addUser/**").permitAll()
-                        .requestMatchers("/user/userDetails/**")
-                        .hasAnyRole("SERVICE", "ADMIN")
+                        .requestMatchers("/txn/initTxn/**")
+                        .hasAnyRole("USER")
                         .anyRequest().authenticated()
                 );
 
@@ -57,4 +56,3 @@ public class SecurityConfig {
 
 
 }
-

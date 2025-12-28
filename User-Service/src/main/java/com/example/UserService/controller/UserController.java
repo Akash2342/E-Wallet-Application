@@ -1,15 +1,14 @@
 package com.example.UserService.controller;
 
 import com.example.UserService.dtos.UserRequestDTO;
+import com.example.UserService.dtos.UserSecurityDTO;
 import com.example.UserService.model.Users;
 import com.example.UserService.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -33,5 +32,24 @@ public class UserController {
 
         // 400 Bad Request, no body
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/userDetails")
+    public UserSecurityDTO getUserDetails(@RequestParam("contact") String contact){
+        Users user = userService.loadUserByUsername(contact);
+        System.out.println("User Details logged: "+user);
+
+        return new UserSecurityDTO(
+                user.getContact(),
+                user.getPassword(),
+                user.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList(),
+                user.isAccountNonExpired(),
+                user.isAccountNonLocked(),
+                user.isCredentialsNonExpired(),
+                user.isEnabled()
+        );
     }
 }
